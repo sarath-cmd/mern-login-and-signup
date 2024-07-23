@@ -1,0 +1,22 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+#background {
+    background-image: url("../asset/bg.jpeg");
+    background-position: center;
+    background-size: cover;
+}
+
+.regimg {
+    background-image: url("../asset/regbgremoved.png");
+    background-position: center;
+    background-size: cover;
+}
+
+.otpimg {
+    background-image: url("../asset/otp.jpeg");
+    background-position: center;
+    background-size: cover;
+}
