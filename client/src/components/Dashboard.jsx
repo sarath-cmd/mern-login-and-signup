@@ -1,23 +1,41 @@
 import { useEffect } from 'react';
-import { Navigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const user =localStorage.getItem('userState')
+  const navigate = useNavigate();
+  const location = useLocation(); 
+  const { email } = location.state;
+  
   useEffect(() => {
-    toast.success('Login successful...!');
-  }, []);
+    const checkVs = async () => {
+      try {
+        const response = await axios.post('http://localhost:3000/Dashboard', {
+          email,
+        });
+        if (!email) {
+          navigate('/login', { replace: true })
+          return;
+        }
+        if (response.data === 'backend accepts') {
+          toast.success('Login successful...!');
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error('Internal server error');
+      }
+    };
+    checkVs();
+  }, [navigate, email]);
 
   return (
     <div>
-      <div>
-        {!user && (<Navigate to='/login' replace={true} />)}
-        {user && (<div>Dashboard</div>)}
-      </div>
-      <ToastContainer position="top-right" autoClose={2000} theme="dark" draggable='true' />
+      <div>Dashboard</div>
+      <ToastContainer position="top-right" autoClose={2000} theme="dark" draggable />
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

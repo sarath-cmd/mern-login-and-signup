@@ -1,45 +1,32 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Otpverification = () => {
-  const [otp, setOtp] = useState(new Array(4).fill(''));
-  const inputRefs = useRef([])
-  const navigate = useNavigate
+  const [otp, setOtp] = useState();
+  const navigate = useNavigate()
+  const location = useLocation(); 
+  const { email } = location.state;
 
-  useEffect((index) => {
-    if (inputRefs.current[index = 0]) {
-      inputRefs.current[index].focus()
-    }
-  }, [])
-  
-
-  function handleOnChange(e, index) {
-    const value = e.target.value
-    if(/^[0-9]*$|^$/.test(value)) {
-      const newOpt = [...otp]
-      newOpt[index] = value.substring(value.length - 1)
-      setOtp(newOpt)
-      // the below line of code will move the focus from one box to another left to right
-      if (index < 4 && !otp[index] && inputRefs.current[index + 1]) {
-        inputRefs.current[index + 1].focus();
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3000/Otpverification', {
+        email,
+        EO: otp
+      });
+      if(response.status === 200) {
+        navigate('/login', {replace:'true'})
+        toast.success('Registeration Successful');
       }
+    } catch (error) {
+      console.log(error)
+      toast.error('Internal server error');
     }
   }
 
-  function handleOnClick(index) {
-    inputRefs.current[index].setSelectionRange(1, 1)
-    // now the above line will move the cursor to the end of the  because the starting and ending point
-    // are after the first element
-  }
-
-  function handleOnKeyDown(e, index) {
-    // the below line of code will move the focus from one box to another rigth to left
-    if (e.key === "Backspace" && index > 0 && !otp[index] && inputRefs.current[index - 1]) {
-      inputRefs.current[index - 1].focus();
-    }
-
-    navigate('/loginpage', {replace:'true'})
-  }
 
   return (
     <section className='overscroll-none select-none'>
@@ -57,22 +44,21 @@ const Otpverification = () => {
             </p>
 
             <div className='flex justify-center'>
-              {otp.map((value, index) => (
-                <input
-                  key={index}
-                  type='text'
-                  className='w-[50px] h-[50px] m-[0.5%] mb-[5%] bg-slate-400 text-center sm:m-[3%] sm:mb-[5%] xl:m-[4%] xl:mb-[5%] 2xl:w-[75px] 2xl:h-[75px] '
-                  value={value}
-                  onChange={(e) => handleOnChange(e ,index)}
-                  ref={(input) => inputRefs.current[index] = input}
-                  onKeyDown={(e) => handleOnKeyDown(e,index)}
-                  onClick={() => handleOnClick(index)}
-                />
-              ))}
+              <input
+                type='number'
+                className='w-[50%] p-2 m-[0.5%] mb-[5%] bg-slate-400 text-center sm:m-[3%] sm:mb-[5%] xl:m-[4%] xl:mb-[5%] '
+                onChange={(e) => setOtp(e.target.value)}
+              />
+            </div>
+            <div className='flex justify-center'>
+              <button className='px-5 py-2 mb-5 rounded bg-slate-400 font-black text-2xl' onClick={(e) => handleSubmit(e)}>
+                Submit
+              </button>
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer position="top-right" autoClose={5000} theme="dark" />
     </section>
   );
 };

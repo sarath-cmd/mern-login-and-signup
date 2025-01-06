@@ -26,7 +26,7 @@ function Register() {
         console.log(response)
         if (response.status === 200) {
           toast.success('Registration successful!');
-          navigate('/otpverification', { replace: true })
+          navigate('/Otpverification', { replace: true, state: { email } });
         }
       } catch (error) {
         if (error.response) {
